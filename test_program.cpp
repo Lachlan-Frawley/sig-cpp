@@ -26,10 +26,10 @@ void my_bound_exit_handler(bool is_quick)
     }
 }
 
-/*void my_cleanup_signal_handler(int signal)
+void my_cleanup_signal_handler(int signal)
 {
     std::cerr << "Cleaning up! (I swear!)" << std::endl;
-}*/
+}
 
 int main(int argc, char** argv)
 {
@@ -37,7 +37,8 @@ int main(int argc, char** argv)
 
     sig::initialize();
 
-    //sig::push_signal_handler(my_cleanup_signal_handler, { sig::signals::INTERRUPT, sig::signals::TERMINATE });
+    sig::push_signal_handler(my_cleanup_signal_handler, { sig::signals::INTERRUPT, sig::signals::TERMINATE });
+    std::raise(SIGINT);
 
     sig::push_exit_handler(my_exit_handler);
     sig::push_quick_exit_handler(my_quick_exit_handler);

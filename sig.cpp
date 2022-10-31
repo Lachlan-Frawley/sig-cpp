@@ -12,6 +12,12 @@ static std::unordered_map<sig::signals, std::vector<sig::signal_handler_type>> _
 static std::vector<sig::exit_handler_type> _exit_handlers;
 static std::vector<sig::exit_handler_type> _quick_exit_handlers;
 
+static bool sig_IS_SIGNAL_RERAISE(int signal)
+{
+    // TODO
+    return true;
+}
+
 static void sig_SIGNAL_HANDLER(int signal)
 {
     LOCK();
@@ -33,17 +39,28 @@ static void sig_SIGNAL_HANDLER(int signal)
         }
     }
 
-    auto base_handler = _default_handlers.find(f_signal);
-    if(base_handler != _default_handlers.end())
+    if(sig_IS_SIGNAL_RERAISE(signal))
     {
-        base_handler->second(signal);
+        auto base_handler = _default_handlers.find(f_signal);
+        if(base_handler != _default_handlers.end())
+        {
+            auto handler = base_handler->second;
+            if(handler)
+            {
+                // Re-insert the original handler and raise the signal
+                std::signal(signal, handler);
+                std::raise(signal);
+            }
+            else
+            {
+                // TODO - Error
+            }
+        }
+        else
+        {
+            // TODO - Error
+        }
     }
-    else
-    {
-        // TODO - Error
-    }
-
-    // TODO - Anything more?
 }
 
 static void sig_EXIT_HANDLER()
