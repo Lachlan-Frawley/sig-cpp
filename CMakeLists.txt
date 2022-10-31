@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(sigcpp VERSION 0.1.0 LANGUAGES CXX)
 
+option(BUILD_TEST_PROGRAM "Build testing program" ON)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(EXPORT_HEADERS sig.h)
@@ -8,8 +10,11 @@ set(EXPORT_HEADERS sig.h)
 add_library(sigcpp SHARED sig.cpp)
 add_library(sigcpp-static STATIC sig.cpp)
 
-add_executable(sig-test test_program.cpp)
-target_link_libraries(sig-test PUBLIC sigcpp)
+if(BUILD_TEST_PROGRAM)
+    find_package(CLI11 REQUIRED)
+    add_executable(sig-test test_program.cpp)
+    target_link_libraries(sig-test PUBLIC sigcpp CLI11::CLI11)
+endif(BUILD_TEST_PROGRAM)
 
 set_target_properties(sigcpp PROPERTIES VERSION ${CMAKE_PROJECT_VERSION} SOVERSION 1)
 
