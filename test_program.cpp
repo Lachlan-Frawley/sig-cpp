@@ -4,27 +4,6 @@
 
 #include <CLI/CLI.hpp>
 
-void my_exit_handler()
-{
-    std::cout << "atexit() handler" << std::endl;
-}
-
-void my_quick_exit_handler()
-{
-    std::cout << "at_quick_exit() handler" << std::endl;
-}
-
-void my_bound_exit_handler(bool is_quick)
-{
-    if(is_quick)
-    {
-        std::cout << "See you later! (Quick)" << std::endl;
-    }
-    else
-    {
-        std::cout << "See you later! (Normal)" << std::endl;
-    }
-}
 
 void my_cleanup_signal_handler(int signal)
 {
@@ -37,14 +16,14 @@ int main(int argc, char** argv)
 
     sig::initialize();
 
-    sig::push_signal_handler(my_cleanup_signal_handler, { sig::signals::INTERRUPT, sig::signals::TERMINATE });
-    std::raise(SIGINT);
+    sig::push_signal_handler(my_cleanup_signal_handler, { sig::ALL_SIGNALS.begin(), sig::ALL_SIGNALS.end() });
 
-    sig::push_exit_handler(my_exit_handler);
-    sig::push_quick_exit_handler(my_quick_exit_handler);
+    //std::raise(SIGPIPE);
 
-    sig::push_exit_handler(std::bind(my_bound_exit_handler, false));
-    sig::push_quick_exit_handler(std::bind(my_bound_exit_handler, true));
+    int* var = nullptr;
+    (*var) = 1;
+
+    std::cout << "Goodbye World!" << std::endl;
 
     return 0;
 }
