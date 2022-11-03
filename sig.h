@@ -49,4 +49,8 @@ namespace sig
 
     void push_signal_handler(const signal_handler_type& func, signals signal);
     void push_signal_handler(const signal_handler_type& func, const std::set<signals>& signals);
+
+    void push_temporary_handler(const signal_handler_type& func, signals signal);
+    signal_handler_type pop_temporary_handler(signals signal);
+    bool is_temporary_handler_populated(signals signal);
 }

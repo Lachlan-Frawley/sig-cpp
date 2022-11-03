@@ -9,6 +9,7 @@ static std::recursive_mutex _mutex;
 
 static std::unordered_map<sig::signals, sighandler_t> default_handlers;
 static std::unordered_map<sig::signals, std::vector<sig::signal_handler_type>> signal_handlers;
+static std::unordered_map<sig::signals, sig::signal_handler_type> temporary_handlers;
 
 static sig::Settings sig_settings;
 
@@ -25,6 +26,18 @@ static void sig_SIGNAL_HANDLER(int signal)
     LOCK();
 
     auto f_signal = static_cast<sig::signals>(signal);
+
+    auto found_tmp = temporary_handlers.find(f_signal);
+    if(found_tmp != temporary_handlers.end())
+    {
+        auto func = found_tmp->second;
+        if(func)
+        {
+            func(signal);
+        }
+
+        return;
+    }
 
     auto found_handlers = signal_handlers.find(f_signal);
     if(found_handlers != signal_handlers.end())
@@ -104,4 +117,31 @@ void sig::push_signal_handler(const sig::signal_handler_type& func, const std::s
         auto& handlers = signal_handlers[sg];
         handlers.emplace_back(func);
     }
+}
+
+void sig::push_temporary_handler(const sig::signal_handler_type &func, sig::signals signal)
+{
+    if(temporary_handlers.find(signal) == temporary_handlers.end())
+    {
+        temporary_handlers[signal] = func;
+    }
+}
+
+sig::signal_handler_type sig::pop_temporary_handler(sig::signals signal)
+{
+    if(temporary_handlers.find(signal) == temporary_handlers.end())
+    {
+        return nullptr;
+    }
+    else
+    {
+        auto tmp = temporary_handlers[signal];
+        temporary_handlers.erase(signal);
+        return tmp;
+    }
+}
+
+bool sig::is_temporary_handler_populated(sig::signals signal)
+{
+    return temporary_handlers.find(signal) != temporary_handlers.end();
 }
