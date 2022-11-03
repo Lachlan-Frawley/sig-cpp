@@ -1,5 +1,6 @@
 #include <set>
 #include <array>
+#include <string>
 #include <csignal>
 #include <functional>
 

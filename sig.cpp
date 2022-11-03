@@ -68,12 +68,12 @@ static void sig_SIGNAL_HANDLER(int signal)
             }
             else
             {
-                //TODO - Log error
+                // TODO - Log Error?
             }
         }
         else
         {
-            //TODO - Log error
+            // TODO - Log Error?
         }
 
         // TODO - Better handling?
@@ -93,9 +93,7 @@ void sig::initialize(sig::Settings settings) noexcept
         for(sig::signals sg : ALL_SIGNALS)
         {
             auto default_handler = std::signal(static_cast<int>(sg), sig_SIGNAL_HANDLER);
-
-            // TODO - Error
-            auto result = default_handlers.emplace(sg, default_handler);
+            default_handlers.emplace(sg, default_handler);
         }
     }
 }
