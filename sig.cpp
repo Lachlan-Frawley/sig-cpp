@@ -10,27 +10,14 @@ static std::recursive_mutex _mutex;
 static std::unordered_map<sig::signals, sighandler_t> default_handlers;
 static std::unordered_map<sig::signals, std::vector<sig::signal_handler_type>> signal_handlers;
 
+static sig::Settings sig_settings;
+
 static bool sig_IS_SIGNAL_FATAL(int signal)
 {
     auto sg = static_cast<sig::signals>(signal);
 
-    // While it is clearly not required to populate all the cases, I feel it makes things more explicit
-    switch(sg)
-    {
-        case sig::signals::USER1:
-        case sig::signals::USER2:
-        case sig::signals::PIPE:
-            return false;
-
-        case sig::signals::INTERRUPT:
-        case sig::signals::TERMINATE:
-        case sig::signals::ABORT:
-        case sig::signals::QUIT:
-        case sig::signals::SEGFAULT:
-            return true;
-    }
-
-    return true;
+    // If we can find the signal in the 'fatal_signals' set, then it's fatal!
+    return sig_settings.fatal_signals.find(sg) != sig_settings.fatal_signals.end();
 }
 
 static void sig_SIGNAL_HANDLER(int signal)
@@ -88,6 +75,7 @@ void sig::initialize(sig::Settings settings) noexcept
     if(!isInitialized)
     {
         isInitialized = true;
+        sig_settings = std::move(settings);
 
         for(sig::signals sg : ALL_SIGNALS)
         {

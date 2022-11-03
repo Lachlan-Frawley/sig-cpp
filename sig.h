@@ -31,9 +31,18 @@ namespace sig
         signals::PIPE
     };
 
+    constexpr std::array FATAL_SIGNALS
+    {
+        signals::INTERRUPT,
+        signals::TERMINATE,
+        signals::ABORT,
+        signals::QUIT,
+        signals::SEGFAULT
+    };
+
     struct Settings
     {
-        // TODO - surely will have stuff in here
+        std::set<signals> fatal_signals { FATAL_SIGNALS.begin(), FATAL_SIGNALS.end() };
     };
 
     void initialize(Settings settings = {}) noexcept;
