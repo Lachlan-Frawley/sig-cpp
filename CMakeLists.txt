@@ -3,6 +3,7 @@ project(sigcpp VERSION 0.1.0 LANGUAGES CXX)
 
 option(BUILD_TEST_PROGRAM "Build testing program" ON)
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(EXPORT_HEADERS sig.h)
